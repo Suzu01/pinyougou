@@ -1,4 +1,4 @@
-package com.pinyougou.search.controller;
+package com.pinyougou.portal.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.pinyougou.search.service.ItemSearchService;
