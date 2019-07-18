@@ -5,6 +5,7 @@ import com.pinyougou.pojo.TbItem;
 import com.pinyougou.search.service.ItemSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.*;
 import org.springframework.data.solr.core.query.result.*;
@@ -18,6 +19,9 @@ import java.util.Map;
 public class ItemSearchServiceImpl implements ItemSearchService {
     @Autowired
     private SolrTemplate solrTemplate;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
     @Override
     public Map<String, Object> search(Map searchMap) {
         /*Map<String,Object> map = new HashMap<>();
@@ -35,8 +39,18 @@ public class ItemSearchServiceImpl implements ItemSearchService {
         map.putAll(searchList(searchMap));
 
         //2.查询分类列表
-        map.put("categoryList",searchCategoryList(searchMap));
+        List categoryList = searchCategoryList(searchMap);
+        map.put("categoryList",categoryList);
+
+        //3.查询商品品牌和商品规格
+        if (categoryList.size()>0){
+            String catogery = (String) categoryList.get(0);
+            map.putAll(searchBrandsAndSpecs(catogery));
+        }
+
         return map;
+
+
     }
 
     private Map searchList(Map searchMap){
@@ -95,6 +109,20 @@ public class ItemSearchServiceImpl implements ItemSearchService {
         for(GroupEntry<TbItem> entry:content){
             list.add(entry.getGroupValue());//将分组结果的名称封装到返回值中
         }
-        return list; }
+        return list;
+    }
+
+    private Map searchBrandsAndSpecs(String category){
+        Map map = new HashMap();
+        Long typeId = (Long) redisTemplate.boundHashOps("itemCat").get(category);
+        if (typeId != null){
+            //查询品牌列表
+            List brandList = (List) redisTemplate.boundHashOps("brandList").get(typeId);
+            List specList = (List) redisTemplate.boundHashOps("specList").get(typeId);
+            map.put("brandList",brandList);
+            map.put("specList",specList);
+        }
+        return map;
+    }
 
 }

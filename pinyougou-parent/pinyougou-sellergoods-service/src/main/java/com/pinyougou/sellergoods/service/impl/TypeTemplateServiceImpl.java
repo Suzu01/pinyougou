@@ -1,5 +1,11 @@
 package com.pinyougou.sellergoods.service.impl;
 import java.util.List;
+import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
+import com.pinyougou.mapper.TbSpecificationOptionMapper;
+import com.pinyougou.pojo.TbSpecificationOption;
+import com.pinyougou.pojo.TbSpecificationOptionExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.Page;
@@ -11,6 +17,7 @@ import com.pinyougou.pojo.TbTypeTemplateExample.Criteria;
 import com.pinyougou.sellergoods.service.TypeTemplateService;
 
 import entity.PageResult;
+import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * 服务实现层
@@ -22,6 +29,9 @@ public class TypeTemplateServiceImpl implements TypeTemplateService {
 
 	@Autowired
 	private TbTypeTemplateMapper typeTemplateMapper;
+
+	@Autowired
+	private RedisTemplate redisTemplate;
 	
 	/**
 	 * 查询全部
@@ -101,9 +111,53 @@ public class TypeTemplateServiceImpl implements TypeTemplateService {
 			}
 	
 		}
-		
-		Page<TbTypeTemplate> page= (Page<TbTypeTemplate>)typeTemplateMapper.selectByExample(example);		
+
+		Page<TbTypeTemplate> page= (Page<TbTypeTemplate>)typeTemplateMapper.selectByExample(example);
+		saveToRedis();
 		return new PageResult(page.getTotal(), page.getResult());
+	}
+
+	private void saveToRedis(){
+		//将品牌放入缓存
+		List<TbTypeTemplate> typeTemplateList = findAll();
+		for (TbTypeTemplate typeTemplate : typeTemplateList) {
+			List<Map> brandList = JSON.parseArray(typeTemplate.getBrandIds(), Map.class);
+			redisTemplate.boundHashOps("brandList").put(typeTemplate.getId(),brandList);
+			System.out.println("brandList加入缓存");
+
+			//将规格放入缓存
+			List<Map> specList = findSpecList(typeTemplate.getId());
+			redisTemplate.boundHashOps("specList").put(typeTemplate.getId(),specList);
+			System.out.println("specList加入缓存");
+		}
+
+
+	}
+
+	@Autowired
+	private TbSpecificationOptionMapper specificationOptionMapper ;
+
+	@Override
+	public List<Map> findSpecList(Long id) {
+		//根据ID查询到模板对象
+		TbTypeTemplate typeTemplate = typeTemplateMapper.selectByPrimaryKey(id);
+		// 获得规格的数据spec_ids
+		String specIds = typeTemplate.getSpecIds();// [{"id":27,"text":"网络"},{"id":32,"text":"机身内存"}]
+		// 将specIds的字符串转成JSON的List<Map>
+		List<Map> list = JSON.parseArray(specIds, Map.class);
+		// 获得每条记录:
+		for (Map map : list) {
+			// 根据规格的ID 查询规格选项的数据:
+			// 设置查询条件:
+			TbSpecificationOptionExample example = new TbSpecificationOptionExample();
+			com.pinyougou.pojo.TbSpecificationOptionExample.Criteria criteria = example.createCriteria();
+			criteria.andSpecIdEqualTo(new Long((Integer)map.get("id")));
+
+			List<TbSpecificationOption> specOptionList = specificationOptionMapper.selectByExample(example);
+
+			map.put("options", specOptionList);//{"id":27,"text":"网络",options:[{id：xxx,optionName:移动2G}]}
+		}
+		return list;
 	}
 	
 }

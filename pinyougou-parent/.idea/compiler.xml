@@ -25,20 +25,35 @@
     <bytecodeTargetLevel>
       <module name="generatorSqlmapCustom" target="1.5" />
       <module name="pinyougou-common" target="1.7" />
+      <module name="pinyougou-common (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-content-interface" target="1.7" />
+      <module name="pinyougou-content-interface (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-content-service" target="1.7" />
+      <module name="pinyougou-content-service (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-dao" target="1.7" />
+      <module name="pinyougou-dao (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-manager-web" target="1.7" />
+      <module name="pinyougou-manager-web (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-parent" target="1.7" />
+      <module name="pinyougou-parent (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-pojo" target="1.7" />
+      <module name="pinyougou-pojo (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-portal-web" target="1.7" />
+      <module name="pinyougou-portal-web (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-search-interface" target="1.7" />
+      <module name="pinyougou-search-interface (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-search-service" target="1.7" />
+      <module name="pinyougou-search-service (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-search-web" target="1.7" />
+      <module name="pinyougou-search-web (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-sellergoods-interface" target="1.7" />
+      <module name="pinyougou-sellergoods-interface (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-sellergoods-service" target="1.7" />
+      <module name="pinyougou-sellergoods-service (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-shop-web" target="1.7" />
+      <module name="pinyougou-shop-web (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougou-solr-util" target="1.7" />
+      <module name="pinyougou-solr-util (1) (com.pinyougou)" target="1.7" />
       <module name="pinyougoucontentinterface" target="1.7" />
     </bytecodeTargetLevel>
   </component>
